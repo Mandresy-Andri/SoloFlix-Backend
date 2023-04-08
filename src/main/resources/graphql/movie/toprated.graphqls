@@ -1,0 +1,8 @@
+type TopRatedMovie {
+    id: String!
+    movie: Movie!
+}
+
+extend type Query {
+    topRatedMovies: [TopRatedMovie]!
+}

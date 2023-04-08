@@ -1,0 +1,8 @@
+type TrendingMovie {
+    id: String!
+    movie: Movie!
+}
+
+extend type Query {
+    trendingMovies: [TrendingMovie]!
+}

@@ -1,0 +1,11 @@
+type MyList {
+    id: String!
+    movie: Movie!
+    user: User!
+}
+
+extend type Query {
+    myLists: [MyList]!
+
+    findMyListByUserEmail(email:String): [MyList]!
+}

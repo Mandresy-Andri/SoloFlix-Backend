@@ -1,0 +1,8 @@
+type RomanceMovie {
+    id: String!
+    movie: Movie!
+}
+
+extend type Query {
+    romanceMovies: [RomanceMovie]!
+}

@@ -1,0 +1,18 @@
+type Movie {
+    id: String!
+    reference: String!
+    title: String!
+    description:String!
+    date: String!
+    image: String!
+    video:String!
+    rating:Float!
+}
+
+type Query {
+    movies: [Movie]!
+
+    findMovieByTitle(title:String): [Movie]
+
+    findMovieById(id:String): Movie
+}

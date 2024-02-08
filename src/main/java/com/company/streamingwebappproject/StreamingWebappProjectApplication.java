@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 
 //@SpringBootApplication()
 //@EnableResourceServer
-@SpringBootApplication(exclude = { SecurityAutoConfiguration.class})
+@SpringBootApplication()
 public class StreamingWebappProjectApplication {
 
 	public static void main(String[] args) {

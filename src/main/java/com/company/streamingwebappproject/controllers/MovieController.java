@@ -15,11 +15,11 @@ public class MovieController {
     @Autowired
     ServiceLayer serviceLayer;
 
-    @GetMapping(value = "/greeter")
-    @ResponseStatus(HttpStatus.OK)
-    public void greet(Principal principal) {
-        System.out.println("The user logged in is"+principal.getName());
-    }
+//    @GetMapping(value = "/greeter")
+//    @ResponseStatus(HttpStatus.OK)
+//    public void greet(Principal principal) {
+//        System.out.println("The user logged in is"+principal.getName());
+//    }
 
     @GetMapping(value = "/movies/popular")
     @ResponseStatus(HttpStatus.OK)

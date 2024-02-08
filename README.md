@@ -44,7 +44,9 @@ The movie data is originally obtained from TMDB API, and cached inside the datab
 ## Executing program
 
 ---
-* The service can be accessed at this url: 
+* The fully working application can be accessed at this url: https://soloflix.onrender.com/
+* Use this username: plainUser@gmail.com
+* Use this password: password
 
 
 ## Credits

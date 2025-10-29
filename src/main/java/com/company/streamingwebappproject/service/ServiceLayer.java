@@ -10,6 +10,7 @@ import com.company.streamingwebappproject.models.sections.TopRatedMovie;
 import com.company.streamingwebappproject.models.sections.TrendingMovie;
 import com.company.streamingwebappproject.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -33,22 +34,23 @@ public class ServiceLayer {
     TopRatedMovieRepository topRatedMovieRepository;
     @Autowired
     TrendingMovieRepository trendingMovieRepository;
-
+    @Value("${tmdb.api.key}")
+    private String apiKey;
 
     public ResponseEntity<List<Movie>> findPopularMovies() {
-        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/movie/popular?api_key=4985fd38d196d3bf733eca2fa49f61bd&language=en-US&page=1");
+        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/movie/popular?api_key="+apiKey+"&language=en-US&page=1");
     }
 
     public ResponseEntity<List<Movie>> findTrendingMovies() {
-        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/trending/movie/week?api_key=4985fd38d196d3bf733eca2fa49f61bd");
+        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/trending/movie/week?api_key="+apiKey);
     }
 
     public ResponseEntity<List<Movie>> findTopRatedMovies() {
-        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/movie/top_rated?api_key=4985fd38d196d3bf733eca2fa49f61bd&language=en-US&page=1");
+        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/movie/top_rated?api_key="+apiKey+"&language=en-US&page=1");
     }
 
     public ResponseEntity<List<Movie>> findRomanceMovies() {
-        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/discover/movie?api_key=4985fd38d196d3bf733eca2fa49f61bd&with_genres=10749");
+        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&with_genres=10749");
     }
 
     //Finds movies from OMDB API given the uri
@@ -83,7 +85,7 @@ public class ServiceLayer {
     //Movie trailer link is obtained through OMDB API uri, given the movie id
     public void findMovieVideo(List<Movie> movieResponse) {
         for (Movie movie : movieResponse) {
-            WebClient videoClient = WebClient.create("https://api.themoviedb.org/3/movie/"+movie.getReference()+"/videos?api_key=4985fd38d196d3bf733eca2fa49f61bd&language=en-US");
+            WebClient videoClient = WebClient.create("https://api.themoviedb.org/3/movie/"+movie.getReference()+"/videos?api_key="+apiKey+"&language=en-US");
             List<Video> videoResponse = null;
             try {
                 Mono<VideoResults> response = videoClient

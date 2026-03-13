@@ -2,10 +2,38 @@ type MyList {
     id: String!
     movie: Movie!
     user: User!
+    notes: String
+    userRating: Float
+    watched: Boolean!
+    recommended: Boolean
+    dateAdded: String
 }
 
 extend type Query {
     myLists: [MyList]!
+    findMyListByUserEmail(email: String!): [MyList]!
+    findMyListItem(userId: String!, movieId: String!): MyList
+}
 
-    findMyListByUserEmail(email:String): [MyList]!
+extend type Mutation {
+    addToMyList(
+        userEmail: String!
+        movieId: String!
+        notes: String
+        userRating: Float
+        watched: Boolean
+        recommended: Boolean
+    ): MyList!
+
+    updateMyListItem(
+        id: String!
+        notes: String
+        userRating: Float
+        watched: Boolean
+        recommended: Boolean
+    ): MyList!
+
+    removeFromMyList(id: String!): Boolean!
+
+    toggleWatched(id: String!): MyList!
 }

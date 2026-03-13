@@ -15,4 +15,12 @@ type Query {
     findMovieByTitle(title:String): [Movie]
 
     findMovieById(id:String): Movie
+
+    searchMovies(query: String!): [Movie]!
+
+    searchMoviesInDatabase(query: String!): [Movie]!
+}
+
+extend type Mutation {
+    cacheMovie(movieId: String!): Movie
 }

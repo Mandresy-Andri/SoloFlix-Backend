@@ -155,4 +155,97 @@ public class ServiceLayer {
 
         return movies;
     }
+
+    public List<Movie> searchMovies(String query) {
+        // Search TMDB API without auto-caching
+        try {
+            String searchUrl = "https://api.themoviedb.org/3/search/movie?api_key="
+                    + apiKey + "&query=" + query.replace(" ", "+") + "&language=en-US&page=1";
+            ResponseEntity<List<Movie>> apiResponse = findMoviesByApiEndpoint(searchUrl);
+            List<Movie> apiMovies = apiResponse.getBody();
+
+            if (apiMovies != null && !apiMovies.isEmpty()) {
+                // Remove movies missing required data (reference is the TMDB id)
+                apiMovies.removeIf(movie -> movie == null || movie.getReference() == null);
+
+                // Set defaults for ALL non-null GraphQL fields on unsaved TMDB movies
+                for (Movie movie : apiMovies) {
+                    if (movie.getId() == null) movie.setId(movie.getReference());
+                    if (movie.getTitle() == null) movie.setTitle("Unknown Title");
+                    if (movie.getDescription() == null) movie.setDescription("");
+                    if (movie.getDate() == null) movie.setDate("");
+                    if (movie.getVideo() == null) movie.setVideo("");
+                    // image getter prepends base URL, so null image becomes "https://...null"
+                    // which is safe for GraphQL but let's set a placeholder
+                    if (movie.getImage() == null || movie.getImage().contains("null")) {
+                        movie.setImage("");
+                    }
+                }
+                System.out.println("TMDB search returned " + apiMovies.size() + " results for: " + query);
+                return apiMovies;
+            }
+        } catch (Exception e) {
+            System.out.println("Search API error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return java.util.Collections.emptyList();
+    }
+
+    public Movie cacheMovie(String movieId) {
+        // Check if movie already exists in database by TMDB reference
+        try {
+            java.math.BigInteger refId = new java.math.BigInteger(movieId);
+            java.util.Optional<Movie> existing = movieRepository.findByReference(refId);
+            if (existing.isPresent()) {
+                return existing.get();
+            }
+
+            // Fetch movie details from TMDB API
+            String detailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey + "&language=en-US";
+            WebClient movieClient = WebClient.create(detailUrl);
+
+            Movie movie = null;
+            try {
+                Mono<Movie> response = movieClient
+                        .get()
+                        .retrieve()
+                        .bodyToMono(Movie.class);
+                movie = response.block();
+            } catch (Exception e) {
+                System.out.println("Error fetching movie details: " + e.getMessage());
+                return null;
+            }
+
+            if (movie != null) {
+                // Fetch and set the video URL
+                WebClient videoClient = WebClient.create("https://api.themoviedb.org/3/movie/" + movieId + "/videos?api_key=" + apiKey + "&language=en-US");
+                List<Video> videoResponse = null;
+                try {
+                    Mono<VideoResults> response = videoClient
+                            .get()
+                            .retrieve()
+                            .bodyToMono(VideoResults.class);
+                    videoResponse = response.block().getResults();
+                } catch (Exception e) {
+                    System.out.println("Error fetching video: " + e.getMessage());
+                }
+
+                if (videoResponse != null && !videoResponse.isEmpty()) {
+                    movie.setVideo("https://www.youtube.com/watch?v=" + videoResponse.get(0).getKey());
+                } else {
+                    // Set empty video URL if no trailer found
+                    movie.setVideo("");
+                    System.out.println("No trailer found for movie: " + movie.getTitle());
+                }
+
+                // Save movie even if no video trailer
+                return movieRepository.save(movie);
+            }
+        } catch (Exception e) {
+            System.out.println("Error caching movie: " + e.getMessage());
+        }
+
+        return null;
+    }
 }

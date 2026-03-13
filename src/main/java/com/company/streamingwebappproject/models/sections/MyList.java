@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -25,6 +26,27 @@ public class MyList {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "notes", columnDefinition = "TEXT")
+    private String notes;
+
+    @Column(name = "user_rating")
+    private Double userRating;
+
+    @Column(name = "watched", nullable = false)
+    private Boolean watched = false;
+
+    @Column(name = "recommended")
+    private Boolean recommended;
+
+    @Column(name = "date_added", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateAdded;
+
+    public MyList() {
+        this.dateAdded = new Date();
+        this.watched = false;
+    }
+
     public BigInteger getId() {
         return id;
     }
@@ -41,6 +63,54 @@ public class MyList {
         this.movie = movie;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public Double getUserRating() {
+        return userRating;
+    }
+
+    public void setUserRating(Double userRating) {
+        this.userRating = userRating;
+    }
+
+    public Boolean getWatched() {
+        return watched;
+    }
+
+    public void setWatched(Boolean watched) {
+        this.watched = watched;
+    }
+
+    public Boolean getRecommended() {
+        return recommended;
+    }
+
+    public void setRecommended(Boolean recommended) {
+        this.recommended = recommended;
+    }
+
+    public Date getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(Date dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,4 +124,3 @@ public class MyList {
         return Objects.hash(id, movie);
     }
 }
-

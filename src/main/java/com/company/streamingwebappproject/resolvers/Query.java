@@ -8,6 +8,8 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.company.streamingwebappproject.service.ServiceLayer;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -28,6 +30,8 @@ public class Query implements GraphQLQueryResolver {
     MyListRepository myListRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ServiceLayer serviceLayer;
 
     public List<Movie> movies() {
         return movieRepository.findAll();
@@ -65,11 +69,24 @@ public class Query implements GraphQLQueryResolver {
         return myListRepository.findByUserEmail(email);
     }
 
+    public MyList findMyListItem(String userId, String movieId) {
+        return myListRepository.findByUserEmailAndMovieId(userId, new BigInteger(movieId))
+                .orElse(null);
+    }
+
     public List<User> users() {
         return userRepository.findAll();
     }
 
     public List<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public List<Movie> searchMovies(String query) {
+        return serviceLayer.searchMovies(query);
+    }
+
+    public List<Movie> searchMoviesInDatabase(String query) {
+        return movieRepository.findByTitleContainingIgnoreCase(query);
     }
 }

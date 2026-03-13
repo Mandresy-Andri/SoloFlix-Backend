@@ -13,4 +13,6 @@ public interface MovieRepository extends JpaRepository<Movie, BigInteger> {
 
     List<Movie> findByTitleContainingIgnoreCase(String title);
 
+    Optional<Movie> findByReference(BigInteger reference);
+
 }

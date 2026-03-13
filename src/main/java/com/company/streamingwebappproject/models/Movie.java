@@ -1,5 +1,6 @@
 package com.company.streamingwebappproject.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -44,6 +45,16 @@ public class Movie {
     @JsonProperty("vote_average")
     @Column(name = "movie_rating")
     private double rating;
+
+    @JsonIgnore
+    public BigInteger getId() {
+        return id;
+    }
+
+    @JsonIgnore
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public BigInteger getReference() {
         return reference;

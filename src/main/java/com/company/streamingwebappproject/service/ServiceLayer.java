@@ -38,22 +38,25 @@ public class ServiceLayer {
     private String apiKey;
 
     public ResponseEntity<List<Movie>> findPopularMovies() {
-        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/movie/popular?api_key="+apiKey+"&language=en-US&page=1");
+        return findMoviesByApiEndpoint(
+                "https://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + "&language=en-US&page=1");
     }
 
     public ResponseEntity<List<Movie>> findTrendingMovies() {
-        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/trending/movie/week?api_key="+apiKey);
+        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/trending/movie/week?api_key=" + apiKey);
     }
 
     public ResponseEntity<List<Movie>> findTopRatedMovies() {
-        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/movie/top_rated?api_key="+apiKey+"&language=en-US&page=1");
+        return findMoviesByApiEndpoint(
+                "https://api.themoviedb.org/3/movie/top_rated?api_key=" + apiKey + "&language=en-US&page=1");
     }
 
     public ResponseEntity<List<Movie>> findRomanceMovies() {
-        return findMoviesByApiEndpoint("https://api.themoviedb.org/3/discover/movie?api_key="+apiKey+"&with_genres=10749");
+        return findMoviesByApiEndpoint(
+                "https://api.themoviedb.org/3/discover/movie?api_key=" + apiKey + "&with_genres=10749");
     }
 
-    //Finds movies from OMDB API given the uri
+    // Finds movies from OMDB API given the uri
     public ResponseEntity<List<Movie>> findMoviesByApiEndpoint(String uri) {
         WebClient movieClient = WebClient.create(uri);
         List<Movie> movieResponse = null;
@@ -80,12 +83,12 @@ public class ServiceLayer {
         return new ResponseEntity(movieResponse, HttpStatus.OK);
     }
 
-
-    //Sets the link to the movie trailer for all movies in a movie list
-    //Movie trailer link is obtained through OMDB API uri, given the movie id
+    // Sets the link to the movie trailer for all movies in a movie list
+    // Movie trailer link is obtained through OMDB API uri, given the movie id
     public void findMovieVideo(List<Movie> movieResponse) {
         for (Movie movie : movieResponse) {
-            WebClient videoClient = WebClient.create("https://api.themoviedb.org/3/movie/"+movie.getReference()+"/videos?api_key="+apiKey+"&language=en-US");
+            WebClient videoClient = WebClient.create("https://api.themoviedb.org/3/movie/" + movie.getReference()
+                    + "/videos?api_key=" + apiKey + "&language=en-US");
             List<Video> videoResponse = null;
             try {
                 Mono<VideoResults> response = videoClient
@@ -99,7 +102,7 @@ public class ServiceLayer {
             }
 
             if (videoResponse != null && !videoResponse.isEmpty()) {
-                movie.setVideo("https://www.youtube.com/watch?v="+videoResponse.get(0).getKey());
+                movie.setVideo("https://www.youtube.com/watch?v=" + videoResponse.get(0).getKey());
             } else {
                 System.out.println("No videos found for movie with ID: " + movie.getReference());
             }
@@ -107,10 +110,9 @@ public class ServiceLayer {
 
     }
 
-
     public List<Movie> populatePopularMovies() {
         List<Movie> movies = findPopularMovies().getBody();
-        for(Movie movie: movies) {
+        for (Movie movie : movies) {
             movieRepository.save(movie);
             PopularMovie popularMovie = new PopularMovie();
             popularMovie.setMovie(movie);
@@ -122,7 +124,7 @@ public class ServiceLayer {
 
     public List<Movie> populateTrendingMovies() {
         List<Movie> movies = findTrendingMovies().getBody();
-        for(Movie movie: movies) {
+        for (Movie movie : movies) {
             movieRepository.save(movie);
             TrendingMovie trendingMovie = new TrendingMovie();
             trendingMovie.setMovie(movie);
@@ -134,7 +136,7 @@ public class ServiceLayer {
 
     public List<Movie> populateTopRatedMovies() {
         List<Movie> movies = findTopRatedMovies().getBody();
-        for(Movie movie: movies) {
+        for (Movie movie : movies) {
             movieRepository.save(movie);
             TopRatedMovie topRatedMovie = new TopRatedMovie();
             topRatedMovie.setMovie(movie);
@@ -146,7 +148,7 @@ public class ServiceLayer {
 
     public List<Movie> populateRomanceMovies() {
         List<Movie> movies = findRomanceMovies().getBody();
-        for(Movie movie: movies) {
+        for (Movie movie : movies) {
             movieRepository.save(movie);
             RomanceMovie romanceMovie = new RomanceMovie();
             romanceMovie.setMovie(movie);
@@ -170,11 +172,16 @@ public class ServiceLayer {
 
                 // Set defaults for ALL non-null GraphQL fields on unsaved TMDB movies
                 for (Movie movie : apiMovies) {
-                    if (movie.getId() == null) movie.setId(movie.getReference());
-                    if (movie.getTitle() == null) movie.setTitle("Unknown Title");
-                    if (movie.getDescription() == null) movie.setDescription("");
-                    if (movie.getDate() == null) movie.setDate("");
-                    if (movie.getVideo() == null) movie.setVideo("");
+                    if (movie.getId() == null)
+                        movie.setId(movie.getReference());
+                    if (movie.getTitle() == null)
+                        movie.setTitle("Unknown Title");
+                    if (movie.getDescription() == null)
+                        movie.setDescription("");
+                    if (movie.getDate() == null)
+                        movie.setDate("");
+                    if (movie.getVideo() == null)
+                        movie.setVideo("");
                     // image getter prepends base URL, so null image becomes "https://...null"
                     // which is safe for GraphQL but let's set a placeholder
                     if (movie.getImage() == null || movie.getImage().contains("null")) {
@@ -202,7 +209,8 @@ public class ServiceLayer {
             }
 
             // Fetch movie details from TMDB API
-            String detailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey + "&language=en-US";
+            String detailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey
+                    + "&language=en-US";
             WebClient movieClient = WebClient.create(detailUrl);
 
             Movie movie = null;
@@ -219,7 +227,8 @@ public class ServiceLayer {
 
             if (movie != null) {
                 // Fetch and set the video URL
-                WebClient videoClient = WebClient.create("https://api.themoviedb.org/3/movie/" + movieId + "/videos?api_key=" + apiKey + "&language=en-US");
+                WebClient videoClient = WebClient.create("https://api.themoviedb.org/3/movie/" + movieId
+                        + "/videos?api_key=" + apiKey + "&language=en-US");
                 List<Video> videoResponse = null;
                 try {
                     Mono<VideoResults> response = videoClient
